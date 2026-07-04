@@ -1,4 +1,4 @@
-const CACHE = 'lecturas-v2';
+const CACHE = 'lecturas-v3';
 const ASSETS = ['./lectura.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
