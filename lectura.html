@@ -571,6 +571,10 @@ input[type="file"] { display: none; }
             oninput="onEmojiInput()" style="font-size:1.4rem;text-align:center;">
           <label class="btn-upload" for="input-image">📷 Subir imagen</label>
           <input type="file" id="input-image" accept="image/*" onchange="onImageUpload(event)">
+          <button type="button" id="btn-clear-cover" onclick="clearCover()"
+            style="display:none;padding:6px;background:#fde8e8;border:1.5px solid #f5b8b8;border-radius:8px;cursor:pointer;font-size:0.78rem;color:#c0392b;font-family:Georgia,serif;">
+            🗑️ Quitar portada
+          </button>
           <div class="cover-hint">Escribe un emoji o sube una foto de portada</div>
         </div>
       </div>
@@ -810,7 +814,15 @@ function updateStarPicker(v) {
 
 function onEmojiInput() {
   const val = document.getElementById('input-emoji').value.trim();
-  if (val) { pendingCover = {type:'emoji', value: val}; setCoverPreview(pendingCover); }
+  if (val) {
+    // Emoji escrito: descartar imagen si había
+    document.getElementById('input-image').value = '';
+    pendingCover = {type:'emoji', value: val};
+  } else {
+    // Campo borrado: volver al estado vacío (sin portada)
+    pendingCover = null;
+  }
+  setCoverPreview(pendingCover);
 }
 
 function onImageUpload(e) {
@@ -818,20 +830,36 @@ function onImageUpload(e) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    pendingCover = {type:'image', value: ev.target.result};
+    // Imagen subida: limpiar emoji
     document.getElementById('input-emoji').value = '';
+    pendingCover = {type:'image', value: ev.target.result};
     setCoverPreview(pendingCover);
   };
   reader.readAsDataURL(file);
 }
 
+function clearCover() {
+  pendingCover = null;
+  document.getElementById('input-emoji').value = '';
+  document.getElementById('input-image').value = '';
+  setCoverPreview(null);
+}
+
 function setCoverPreview(cover) {
-  const el = document.getElementById('cover-preview');
-  if (!cover || cover.type === 'emoji') {
-    el.innerHTML = cover ? cover.value : DEFAULT_COVER[modalTipo];
+  const el  = document.getElementById('cover-preview');
+  const btn = document.getElementById('btn-clear-cover');
+  if (!cover) {
+    el.innerHTML = DEFAULT_COVER[modalTipo] || '📚';
     el.style.fontSize = '2.8rem';
+    btn.style.display = 'none';
+  } else if (cover.type === 'emoji') {
+    el.innerHTML = cover.value;
+    el.style.fontSize = '2.8rem';
+    btn.style.display = '';
   } else {
     el.innerHTML = `<img src="${cover.value}" alt="portada">`;
+    el.style.fontSize = '';
+    btn.style.display = '';
   }
 }
 
