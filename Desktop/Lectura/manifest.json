@@ -1,7 +1,7 @@
 {
-  "name": "Mi Diario de Lecturas",
-  "short_name": "Lecturas",
-  "description": "Seguimiento personal de libros leídos y racha lectora",
+  "name": "Mi Diario Cultural",
+  "short_name": "Diario",
+  "description": "Seguimiento personal de libros, películas y series",
   "start_url": "./lectura.html",
   "display": "standalone",
   "background_color": "#f5f0e8",
