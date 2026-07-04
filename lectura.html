@@ -398,17 +398,22 @@ input[type="file"] { display: none; }
 .filter-bar {
   background: #fff;
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   margin-bottom: 18px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.07);
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
+}
+.filter-row {
+  display: flex;
+  gap: 8px;
   align-items: center;
+  width: 100%;
 }
 .filter-search {
   flex: 1;
-  min-width: 140px;
+  min-width: 0;
   padding: 7px 12px;
   border: 1.5px solid #ddd;
   border-radius: 8px;
@@ -422,27 +427,36 @@ input[type="file"] { display: none; }
   display: flex;
   gap: 4px;
   align-items: center;
+  flex: 1;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
 }
+.filter-stars::-webkit-scrollbar { display: none; }
+
 .filter-star-btn {
   background: #f0ece4;
   border: 1.5px solid transparent;
   border-radius: 6px;
-  padding: 5px 8px;
+  padding: 6px 10px;
   font-size: 0.82rem;
   cursor: pointer;
   color: #888;
   font-family: 'Georgia', serif;
   transition: all 0.15s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .filter-star-btn:hover { border-color: #e8a84e; color: #2c3e50; }
 .filter-star-btn.active { background: #e8a84e; border-color: #e8a84e; color: #fff; font-weight: bold; }
 
 .filter-sort {
-  padding: 7px 10px;
+  flex-shrink: 0;
+  padding: 6px 8px;
   border: 1.5px solid #ddd;
   border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-family: 'Georgia', serif;
   background: #fafafa;
   color: #444;
@@ -500,7 +514,16 @@ input[type="file"] { display: none; }
 <!-- TAB: LIBROS -->
 <div id="tab-libros" class="tab active">
   <div class="filter-bar">
-    <input class="filter-search" type="search" placeholder="🔍 Buscar por título o autor..." oninput="applyFilters('libro')">
+    <div class="filter-row">
+      <input class="filter-search" type="search" placeholder="🔍 Título o autor..." oninput="applyFilters('libro')">
+      <select class="filter-sort" onchange="applyFilters('libro')">
+        <option value="fecha">Reciente</option>
+        <option value="titulo">Título A-Z</option>
+        <option value="rating-desc">Mejor ★</option>
+        <option value="rating-asc">Peor ★</option>
+        <option value="autor">Autor A-Z</option>
+      </select>
+    </div>
     <div class="filter-stars">
       <button class="filter-star-btn active" onclick="setStarFilter('libro',0,this)">Todas</button>
       <button class="filter-star-btn" onclick="setStarFilter('libro',1,this)">★+</button>
@@ -509,13 +532,6 @@ input[type="file"] { display: none; }
       <button class="filter-star-btn" onclick="setStarFilter('libro',4,this)">★★★★+</button>
       <button class="filter-star-btn" onclick="setStarFilter('libro',5,this)">★★★★★</button>
     </div>
-    <select class="filter-sort" onchange="applyFilters('libro')">
-      <option value="fecha">Más reciente</option>
-      <option value="titulo">Título A-Z</option>
-      <option value="rating-desc">Mejor valorados</option>
-      <option value="rating-asc">Peor valorados</option>
-      <option value="autor">Autor A-Z</option>
-    </select>
   </div>
   <div class="section-block">
     <div class="section-header">
@@ -538,7 +554,16 @@ input[type="file"] { display: none; }
 <!-- TAB: PELÍCULAS -->
 <div id="tab-peliculas" class="tab">
   <div class="filter-bar">
-    <input class="filter-search" type="search" placeholder="🔍 Buscar por título o director..." oninput="applyFilters('pelicula')">
+    <div class="filter-row">
+      <input class="filter-search" type="search" placeholder="🔍 Título o director..." oninput="applyFilters('pelicula')">
+      <select class="filter-sort" onchange="applyFilters('pelicula')">
+        <option value="fecha">Reciente</option>
+        <option value="titulo">Título A-Z</option>
+        <option value="rating-desc">Mejor ★</option>
+        <option value="rating-asc">Peor ★</option>
+        <option value="autor">Director A-Z</option>
+      </select>
+    </div>
     <div class="filter-stars">
       <button class="filter-star-btn active" onclick="setStarFilter('pelicula',0,this)">Todas</button>
       <button class="filter-star-btn" onclick="setStarFilter('pelicula',1,this)">★+</button>
@@ -547,13 +572,6 @@ input[type="file"] { display: none; }
       <button class="filter-star-btn" onclick="setStarFilter('pelicula',4,this)">★★★★+</button>
       <button class="filter-star-btn" onclick="setStarFilter('pelicula',5,this)">★★★★★</button>
     </div>
-    <select class="filter-sort" onchange="applyFilters('pelicula')">
-      <option value="fecha">Más reciente</option>
-      <option value="titulo">Título A-Z</option>
-      <option value="rating-desc">Mejor valoradas</option>
-      <option value="rating-asc">Peor valoradas</option>
-      <option value="autor">Director A-Z</option>
-    </select>
   </div>
   <div class="section-block">
     <div class="section-header">
@@ -576,7 +594,16 @@ input[type="file"] { display: none; }
 <!-- TAB: SERIES -->
 <div id="tab-series" class="tab">
   <div class="filter-bar">
-    <input class="filter-search" type="search" placeholder="🔍 Buscar por título o plataforma..." oninput="applyFilters('serie')">
+    <div class="filter-row">
+      <input class="filter-search" type="search" placeholder="🔍 Título o plataforma..." oninput="applyFilters('serie')">
+      <select class="filter-sort" onchange="applyFilters('serie')">
+        <option value="fecha">Reciente</option>
+        <option value="titulo">Título A-Z</option>
+        <option value="rating-desc">Mejor ★</option>
+        <option value="rating-asc">Peor ★</option>
+        <option value="autor">Plataforma A-Z</option>
+      </select>
+    </div>
     <div class="filter-stars">
       <button class="filter-star-btn active" onclick="setStarFilter('serie',0,this)">Todas</button>
       <button class="filter-star-btn" onclick="setStarFilter('serie',1,this)">★+</button>
@@ -585,13 +612,6 @@ input[type="file"] { display: none; }
       <button class="filter-star-btn" onclick="setStarFilter('serie',4,this)">★★★★+</button>
       <button class="filter-star-btn" onclick="setStarFilter('serie',5,this)">★★★★★</button>
     </div>
-    <select class="filter-sort" onchange="applyFilters('serie')">
-      <option value="fecha">Más reciente</option>
-      <option value="titulo">Título A-Z</option>
-      <option value="rating-desc">Mejor valoradas</option>
-      <option value="rating-asc">Peor valoradas</option>
-      <option value="autor">Plataforma A-Z</option>
-    </select>
   </div>
   <div class="section-block">
     <div class="section-header">
