@@ -1,5 +1,5 @@
-const CACHE = 'asistencia-v1';
-const ASSETS = ['asistencia.html', 'manifest.json'];
+const CACHE = 'lecturas-v1';
+const ASSETS = ['./lectura.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
@@ -14,8 +14,6 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Solo cachear recursos locales, no Firebase
-  if (!e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
