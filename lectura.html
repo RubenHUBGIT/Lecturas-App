@@ -394,6 +394,74 @@ input[type="file"] { display: none; }
 .cal-day.today.read { border-color: rgba(255,255,255,0.4); }
 .cal-day.future { opacity: 0.3; cursor: default; }
 
+/* ── Filtros ── */
+.filter-bar {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.filter-search {
+  flex: 1;
+  min-width: 140px;
+  padding: 7px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: 'Georgia', serif;
+  background: #fafafa;
+}
+.filter-search:focus { outline: none; border-color: #e8a84e; background: #fff; }
+
+.filter-stars {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.filter-star-btn {
+  background: #f0ece4;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: #888;
+  font-family: 'Georgia', serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-star-btn:hover { border-color: #e8a84e; color: #2c3e50; }
+.filter-star-btn.active { background: #e8a84e; border-color: #e8a84e; color: #fff; font-weight: bold; }
+
+.filter-sort {
+  padding: 7px 10px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: 'Georgia', serif;
+  background: #fafafa;
+  color: #444;
+  cursor: pointer;
+}
+.filter-sort:focus { outline: none; border-color: #e8a84e; }
+
+.filter-clear {
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  color: #aaa;
+  cursor: pointer;
+  padding: 4px;
+  font-family: 'Georgia', serif;
+  text-decoration: underline;
+}
+.filter-clear:hover { color: #c0392b; }
+
 .calendar-legend { display: flex; gap: 14px; margin-top: 12px; font-size: 0.75rem; color: #777; }
 .legend-item { display: flex; align-items: center; gap: 5px; }
 .legend-dot { width: 13px; height: 13px; border-radius: 3px; }
@@ -431,6 +499,24 @@ input[type="file"] { display: none; }
 
 <!-- TAB: LIBROS -->
 <div id="tab-libros" class="tab active">
+  <div class="filter-bar">
+    <input class="filter-search" type="search" placeholder="🔍 Buscar por título o autor..." oninput="applyFilters('libro')">
+    <div class="filter-stars">
+      <button class="filter-star-btn active" onclick="setStarFilter('libro',0,this)">Todas</button>
+      <button class="filter-star-btn" onclick="setStarFilter('libro',1,this)">★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('libro',2,this)">★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('libro',3,this)">★★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('libro',4,this)">★★★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('libro',5,this)">★★★★★</button>
+    </div>
+    <select class="filter-sort" onchange="applyFilters('libro')">
+      <option value="fecha">Más reciente</option>
+      <option value="titulo">Título A-Z</option>
+      <option value="rating-desc">Mejor valorados</option>
+      <option value="rating-asc">Peor valorados</option>
+      <option value="autor">Autor A-Z</option>
+    </select>
+  </div>
   <div class="section-block">
     <div class="section-header">
       <h2>Leyendo <span class="count-badge" id="cnt-leyendo">0</span></h2>
@@ -451,6 +537,24 @@ input[type="file"] { display: none; }
 
 <!-- TAB: PELÍCULAS -->
 <div id="tab-peliculas" class="tab">
+  <div class="filter-bar">
+    <input class="filter-search" type="search" placeholder="🔍 Buscar por título o director..." oninput="applyFilters('pelicula')">
+    <div class="filter-stars">
+      <button class="filter-star-btn active" onclick="setStarFilter('pelicula',0,this)">Todas</button>
+      <button class="filter-star-btn" onclick="setStarFilter('pelicula',1,this)">★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('pelicula',2,this)">★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('pelicula',3,this)">★★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('pelicula',4,this)">★★★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('pelicula',5,this)">★★★★★</button>
+    </div>
+    <select class="filter-sort" onchange="applyFilters('pelicula')">
+      <option value="fecha">Más reciente</option>
+      <option value="titulo">Título A-Z</option>
+      <option value="rating-desc">Mejor valoradas</option>
+      <option value="rating-asc">Peor valoradas</option>
+      <option value="autor">Director A-Z</option>
+    </select>
+  </div>
   <div class="section-block">
     <div class="section-header">
       <h2>Por ver <span class="count-badge" id="cnt-peli-activo">0</span></h2>
@@ -471,6 +575,24 @@ input[type="file"] { display: none; }
 
 <!-- TAB: SERIES -->
 <div id="tab-series" class="tab">
+  <div class="filter-bar">
+    <input class="filter-search" type="search" placeholder="🔍 Buscar por título o plataforma..." oninput="applyFilters('serie')">
+    <div class="filter-stars">
+      <button class="filter-star-btn active" onclick="setStarFilter('serie',0,this)">Todas</button>
+      <button class="filter-star-btn" onclick="setStarFilter('serie',1,this)">★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('serie',2,this)">★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('serie',3,this)">★★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('serie',4,this)">★★★★+</button>
+      <button class="filter-star-btn" onclick="setStarFilter('serie',5,this)">★★★★★</button>
+    </div>
+    <select class="filter-sort" onchange="applyFilters('serie')">
+      <option value="fecha">Más reciente</option>
+      <option value="titulo">Título A-Z</option>
+      <option value="rating-desc">Mejor valoradas</option>
+      <option value="rating-asc">Peor valoradas</option>
+      <option value="autor">Plataforma A-Z</option>
+    </select>
+  </div>
   <div class="section-block">
     <div class="section-header">
       <h2>Viendo <span class="count-badge" id="cnt-serie-activo">0</span></h2>
@@ -647,6 +769,13 @@ let editingId   = null;
 let currentRating = 0;
 let pendingCover  = null; // {type:'emoji'|'image', value:string}
 
+// ── Estado de filtros por tipo ─────────────────────────────────────────
+const filters = {
+  libro:    { query: '', minRating: 0, sort: 'fecha' },
+  pelicula: { query: '', minRating: 0, sort: 'fecha' },
+  serie:    { query: '', minRating: 0, sort: 'fecha' }
+};
+
 const DEFAULT_COVER = { libro:'📚', pelicula:'🎬', serie:'📺' };
 const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -663,35 +792,80 @@ function showTab(name, btn) {
   if (name === 'reto') renderCalendar();
 }
 
+// ── Filtros ───────────────────────────────────────────────────────────
+function getFilterBar(tipo) {
+  // Encuentra la filter-bar dentro del tab correspondiente
+  const tab = document.getElementById('tab-' + (tipo === 'libro' ? 'libros' : tipo === 'pelicula' ? 'peliculas' : 'series'));
+  return tab ? tab.querySelector('.filter-bar') : null;
+}
+
+function setStarFilter(tipo, val, btn) {
+  filters[tipo].minRating = val;
+  const bar = getFilterBar(tipo);
+  if (bar) bar.querySelectorAll('.filter-star-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters(tipo);
+}
+
+function applyFilters(tipo) {
+  const bar = getFilterBar(tipo);
+  if (bar) {
+    const searchEl = bar.querySelector('.filter-search');
+    const sortEl   = bar.querySelector('.filter-sort');
+    if (searchEl) filters[tipo].query = searchEl.value.trim().toLowerCase();
+    if (sortEl)   filters[tipo].sort  = sortEl.value;
+  }
+  renderTipo(tipo);
+}
+
+function filterAndSort(items, tipo) {
+  const f = filters[tipo];
+  let result = items.filter(item => {
+    const matchQuery = !f.query ||
+      item.title.toLowerCase().includes(f.query) ||
+      (item.sub || '').toLowerCase().includes(f.query);
+    const matchRating = f.minRating === 0
+      ? true
+      : f.minRating === 5 ? item.rating === 5 : item.rating >= f.minRating;
+    return matchQuery && matchRating;
+  });
+
+  result.sort((a, b) => {
+    switch (f.sort) {
+      case 'titulo':      return a.title.localeCompare(b.title);
+      case 'rating-desc': return (b.rating || 0) - (a.rating || 0);
+      case 'rating-asc':  return (a.rating || 0) - (b.rating || 0);
+      case 'autor':       return (a.sub||'').localeCompare(b.sub||'');
+      default:            return 0; // fecha: mantener orden de inserción
+    }
+  });
+  return result;
+}
+
 // ── Render ────────────────────────────────────────────────────────────
-function renderAll() {
-  const tipos = ['libro','pelicula','serie'];
-  const ids   = {
-    'libro-activo':'cnt-leyendo','libro-hecho':'cnt-leidos',
-    'pelicula-activo':'cnt-peli-activo','pelicula-hecho':'cnt-peli-hecho',
-    'serie-activo':'cnt-serie-activo','serie-hecho':'cnt-serie-hecho'
-  };
+const BADGE_IDS = {
+  'libro-activo':'cnt-leyendo','libro-hecho':'cnt-leidos',
+  'pelicula-activo':'cnt-peli-activo','pelicula-hecho':'cnt-peli-hecho',
+  'serie-activo':'cnt-serie-activo','serie-hecho':'cnt-serie-hecho'
+};
 
-  tipos.forEach(tipo => ['activo','hecho'].forEach(status => {
+function renderTipo(tipo) {
+  ['activo','hecho'].forEach(status => {
     const key   = tipo + '-' + status;
-    const items = data.items.filter(i => i.tipo === tipo && i.status === status);
-    document.getElementById('cnt-' + key.replace('libro-activo','leyendo')
-      .replace('libro-hecho','leidos')
-      .replace('pelicula-activo','peli-activo')
-      .replace('pelicula-hecho','peli-hecho')
-      .replace('serie-activo','serie-activo')
-      .replace('serie-hecho','serie-hecho')
-    );
-    // simpler:
-    const badgeId = ids[key];
-    if (badgeId) document.getElementById(badgeId).textContent = items.length;
-    renderGrid('grid-'+key, 'empty-'+key, items, status === 'activo', tipo);
-  }));
+    const raw   = data.items.filter(i => i.tipo === tipo && i.status === status);
+    const shown = filterAndSort(raw, tipo);
+    const badgeId = BADGE_IDS[key];
+    if (badgeId) document.getElementById(badgeId).textContent = raw.length;
+    renderGrid('grid-'+key, 'empty-'+key, shown, raw, status === 'activo', tipo);
+  });
+}
 
+function renderAll() {
+  ['libro','pelicula','serie'].forEach(renderTipo);
   document.getElementById('stat-items').textContent = data.items.length;
 }
 
-function renderGrid(gridId, emptyId, items, isActive, tipo) {
+function renderGrid(gridId, emptyId, items, rawItems, isActive, tipo) {
   const grid  = document.getElementById(gridId);
   const empty = document.getElementById(emptyId);
   if (!grid) return;
@@ -700,6 +874,14 @@ function renderGrid(gridId, emptyId, items, isActive, tipo) {
   if (!items.length) {
     grid.style.display = 'none';
     empty.style.display = 'block';
+    // Mensaje diferente si hay items pero el filtro los oculta todos
+    const p = empty.querySelector('p');
+    if (p) {
+      p.innerHTML = rawItems.length && !items.length
+        ? 'Ningún resultado con los filtros aplicados.<br><a href="#" style="color:#e8a84e;font-size:0.85rem;" onclick="resetFilters(\''+tipo+'\');return false;">Limpiar filtros</a>'
+        : p.dataset.original || p.innerHTML;
+      if (!p.dataset.original) p.dataset.original = p.innerHTML;
+    }
     return;
   }
   grid.style.display = 'grid';
@@ -977,6 +1159,18 @@ function updateStreakStats() {
   document.getElementById('best-streak-display').textContent = `Mejor: ${best} día${best!==1?'s':''}`;
   document.getElementById('stat-total').textContent  = data.readDays.length;
   document.getElementById('stat-month').textContent  = data.readDays.filter(k=>k.startsWith(thisMonth)).length;
+}
+
+function resetFilters(tipo) {
+  filters[tipo] = { query: '', minRating: 0, sort: 'fecha' };
+  const bar = getFilterBar(tipo);
+  if (!bar) return;
+  const searchEl = bar.querySelector('.filter-search');
+  const sortEl   = bar.querySelector('.filter-sort');
+  if (searchEl) searchEl.value = '';
+  if (sortEl)   sortEl.value   = 'fecha';
+  bar.querySelectorAll('.filter-star-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  renderTipo(tipo);
 }
 
 // ── Init ──────────────────────────────────────────────────────────────
