@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "statusMessage": "Preparando rama de sesion...",
+            "command": "$branch = git -C 'C:\\Users\\esteb\\Desktop\\Lectura' branch --show-current; if ($branch -eq 'main') { $today = Get-Date -Format 'yyyy-MM-dd'; $newBranch = \"session/$today\"; $existing = git -C 'C:\\Users\\esteb\\Desktop\\Lectura' branch --list $newBranch; if ($existing) { git -C 'C:\\Users\\esteb\\Desktop\\Lectura' checkout $newBranch 2>$null } else { git -C 'C:\\Users\\esteb\\Desktop\\Lectura' checkout -b $newBranch 2>$null }; $msg = [ordered]@{systemMessage=\"Rama de sesion activa: $newBranch. Recuerda que al final puedes crear un PR desde esta rama a main.\"} | ConvertTo-Json -Compress; Write-Output $msg } else { $msg = [ordered]@{systemMessage=\"Rama activa: $branch\"} | ConvertTo-Json -Compress; Write-Output $msg }"
+          }
+        ]
+      }
+    ]
+  }
+}
