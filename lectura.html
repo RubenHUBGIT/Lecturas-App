@@ -921,7 +921,9 @@ function renderGrid(gridId, emptyId, items, rawItems, isActive, tipo) {
         ${item.note ? `<div class="item-note">${escHtml(item.note)}</div>` : ''}
       </div>
       <div class="card-actions">
-        ${isActive ? `<button class="btn-icon" title="Marcar como finalizado" onclick="markDone('${item.id}')">✅</button>` : ''}
+        ${isActive
+          ? `<button class="btn-icon" title="Marcar como finalizado" onclick="markDone('${item.id}')">✅</button>`
+          : `<button class="btn-icon" title="Volver a activo" onclick="markActive('${item.id}')">🔄</button>`}
         <button class="btn-icon" title="Editar" onclick="openEdit('${item.id}')">✏️</button>
         <button class="btn-icon" title="Eliminar" onclick="deleteItem('${item.id}')">🗑️</button>
       </div>
@@ -1076,6 +1078,11 @@ function deleteItem(id) {
 function markDone(id) {
   const item = data.items.find(x => x.id === id);
   if (item) { item.status = 'hecho'; save(); renderAll(); }
+}
+
+function markActive(id) {
+  const item = data.items.find(x => x.id === id);
+  if (item) { item.status = 'activo'; save(); renderAll(); }
 }
 
 // ── Calendario ────────────────────────────────────────────────────────
