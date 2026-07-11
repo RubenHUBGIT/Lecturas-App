@@ -1,4 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="80" fill="#2c3e50"/>
-  <text x="256" y="340" font-size="280" text-anchor="middle" font-family="serif">📚</text>
+  <!-- Fondo con esquinas redondeadas -->
+  <rect width="512" height="512" rx="90" fill="#2c3e50"/>
+
+  <!-- Libro (abajo izquierda) -->
+  <rect x="48" y="290" width="90" height="118" rx="8" fill="#e8a84e"/>
+  <rect x="56" y="298" width="74" height="102" rx="5" fill="#f5f0e8"/>
+  <rect x="64" y="312" width="58" height="5" rx="2" fill="#ccc"/>
+  <rect x="64" y="324" width="50" height="5" rx="2" fill="#ccc"/>
+  <rect x="64" y="336" width="54" height="5" rx="2" fill="#ccc"/>
+  <rect x="64" y="348" width="44" height="5" rx="2" fill="#ccc"/>
+  <!-- lomo del libro -->
+  <rect x="48" y="290" width="10" height="118" rx="4" fill="#c47d1e"/>
+
+  <!-- Película / claqueta (arriba izquierda) -->
+  <rect x="48" y="104" width="180" height="130" rx="14" fill="#e74c3c"/>
+  <rect x="48" y="104" width="180" height="32" rx="14" fill="#c0392b"/>
+  <rect x="48" y="120" width="180" height="16" fill="#c0392b"/>
+  <!-- rayas de claqueta -->
+  <rect x="68"  y="104" width="16" height="32" rx="3" fill="#f5f0e8" transform="rotate(-12 76 120)"/>
+  <rect x="108" y="104" width="16" height="32" rx="3" fill="#f5f0e8" transform="rotate(-12 116 120)"/>
+  <rect x="148" y="104" width="16" height="32" rx="3" fill="#f5f0e8" transform="rotate(-12 156 120)"/>
+  <rect x="188" y="104" width="16" height="32" rx="3" fill="#f5f0e8" transform="rotate(-12 196 120)"/>
+  <!-- play triangle en la parte del frame -->
+  <polygon points="110,160 110,210 160,185" fill="#f5f0e8" opacity="0.85"/>
+
+  <!-- Serie / pantalla TV (abajo derecha) -->
+  <rect x="290" y="290" width="174" height="118" rx="14" fill="#2980b9"/>
+  <rect x="302" y="302" width="150" height="86" rx="6" fill="#1a252f"/>
+  <!-- botón play pequeño -->
+  <polygon points="355,330 355,368 390,349" fill="#3498db" opacity="0.9"/>
+  <!-- pie de TV -->
+  <rect x="355" y="408" width="52" height="10" rx="4" fill="#2980b9"/>
+  <rect x="363" y="400" width="36" height="12" rx="3" fill="#1f6391"/>
+
+  <!-- Tomate Pomodoro (centro, grande, como protagonista) -->
+  <!-- cuerpo -->
+  <circle cx="320" cy="185" r="88" fill="#e74c3c"/>
+  <!-- brillo -->
+  <ellipse cx="295" cy="148" rx="22" ry="14" fill="#f1948a" opacity="0.55"/>
+  <!-- tallo -->
+  <rect x="314" y="94" width="12" height="28" rx="6" fill="#27ae60"/>
+  <!-- hoja izquierda -->
+  <ellipse cx="296" cy="100" rx="18" ry="9" fill="#2ecc71" transform="rotate(-35 296 100)"/>
+  <!-- hoja derecha -->
+  <ellipse cx="344" cy="100" rx="18" ry="9" fill="#2ecc71" transform="rotate(35 344 100)"/>
+  <!-- líneas verticales del tomate -->
+  <path d="M320 102 Q298 185 320 268" stroke="#c0392b" stroke-width="3" fill="none" opacity="0.4"/>
+  <path d="M320 102 Q342 185 320 268" stroke="#c0392b" stroke-width="3" fill="none" opacity="0.4"/>
+  <path d="M282 120 Q260 185 282 250" stroke="#c0392b" stroke-width="3" fill="none" opacity="0.35"/>
+  <path d="M358 120 Q380 185 358 250" stroke="#c0392b" stroke-width="3" fill="none" opacity="0.35"/>
+
+  <!-- Estrella (rating, esquina superior derecha) -->
+  <polygon points="430,60 441,92 475,92 448,112 458,144 430,124 402,144 412,112 385,92 419,92"
+           fill="#e8a84e"/>
 </svg>
