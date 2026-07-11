@@ -522,6 +522,150 @@ input[type="file"] { display: none; }
 .btn-mark-today:hover { opacity: 0.9; }
 .btn-mark-today.marked { background: linear-gradient(135deg, #4a90d9, #357abd); }
 
+/* ── Pomodoro ── */
+.pomo-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 20px 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+  text-align: center;
+  margin-bottom: 18px;
+}
+.pomo-phase {
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding: 4px 16px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.pomo-phase.work    { background: #fde8e0; color: #c0392b; }
+.pomo-phase.short   { background: #e0f5e8; color: #27ae60; }
+.pomo-phase.long    { background: #dce8f5; color: #2980b9; }
+
+.pomo-circle {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 20px;
+}
+.pomo-circle svg {
+  transform: rotate(-90deg);
+  width: 200px; height: 200px;
+}
+.pomo-circle svg circle { fill: none; stroke-width: 10; stroke-linecap: round; }
+.pomo-track  { stroke: #f0ece4; }
+.pomo-prog   { stroke: #e8a84e; transition: stroke-dashoffset 1s linear, stroke 0.4s; }
+.pomo-prog.work  { stroke: #e74c3c; }
+.pomo-prog.short { stroke: #27ae60; }
+.pomo-prog.long  { stroke: #2980b9; }
+.pomo-time-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.pomo-time {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #2c3e50;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.pomo-session-label { font-size: 0.72rem; color: #aaa; margin-top: 4px; }
+
+.pomo-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.btn-pomo {
+  border: none;
+  border-radius: 50%;
+  width: 56px; height: 56px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.btn-pomo:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.btn-pomo-main  { background: #2c3e50; color: #fff; width: 68px; height: 68px; font-size: 1.7rem; }
+.btn-pomo-reset { background: #f0ece4; color: #888; }
+.btn-pomo-skip  { background: #f0ece4; color: #888; }
+
+.pomo-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.pomo-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #f0ece4;
+  transition: background 0.3s;
+}
+.pomo-dot.done { background: #e74c3c; }
+
+.pomo-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.pomo-settings {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.pomo-settings h4 {
+  font-size: 0.88rem;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-weight: normal;
+  border-left: 3px solid #e8a84e;
+  padding-left: 8px;
+}
+.pomo-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: #555;
+}
+.pomo-setting-row:last-child { margin-bottom: 0; }
+.pomo-num-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pomo-num-input button {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid #ddd;
+  background: #f5f0e8;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.pomo-num-input button:hover { background: #e8e0d0; }
+.pomo-num-input span {
+  min-width: 28px;
+  text-align: center;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
 @media (max-width: 420px) {
   .books-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   header h1 { font-size: 1.2rem; }
@@ -658,6 +802,90 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
+<!-- TAB: POMODORO -->
+<div id="tab-pomodoro" class="tab">
+
+  <div class="pomo-card">
+    <div class="pomo-phase work" id="pomo-phase-label">Trabajo</div>
+
+    <div class="pomo-circle">
+      <svg viewBox="0 0 200 200">
+        <circle class="pomo-track" cx="100" cy="100" r="88"/>
+        <circle class="pomo-prog work" id="pomo-ring" cx="100" cy="100" r="88"
+          stroke-dasharray="553" stroke-dashoffset="0"/>
+      </svg>
+      <div class="pomo-time-label">
+        <div class="pomo-time" id="pomo-display">25:00</div>
+        <div class="pomo-session-label" id="pomo-session-label">Sesión 1 de 4</div>
+      </div>
+    </div>
+
+    <div class="pomo-dots" id="pomo-dots">
+      <div class="pomo-dot"></div>
+      <div class="pomo-dot"></div>
+      <div class="pomo-dot"></div>
+      <div class="pomo-dot"></div>
+    </div>
+
+    <div class="pomo-controls">
+      <button class="btn-pomo btn-pomo-reset" onclick="pomodoroReset()" title="Reiniciar">↺</button>
+      <button class="btn-pomo btn-pomo-main" id="pomo-btn-play" onclick="pomodoroToggle()">▶</button>
+      <button class="btn-pomo btn-pomo-skip" onclick="pomodoroSkip()" title="Saltar fase">⏭</button>
+    </div>
+  </div>
+
+  <div class="pomo-stats">
+    <div class="stat-card">
+      <div class="stat-number" id="pomo-stat-hoy">0</div>
+      <div class="stat-label">Hoy</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="pomo-stat-total">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="pomo-stat-min">0</div>
+      <div class="stat-label">Min hoy</div>
+    </div>
+  </div>
+
+  <div class="pomo-settings">
+    <h4>⚙️ Configuración</h4>
+    <div class="pomo-setting-row">
+      <span>Trabajo (min)</span>
+      <div class="pomo-num-input">
+        <button onclick="pomoCfgChange('work',-1)">−</button>
+        <span id="cfg-work">25</span>
+        <button onclick="pomoCfgChange('work',1)">+</button>
+      </div>
+    </div>
+    <div class="pomo-setting-row">
+      <span>Descanso corto (min)</span>
+      <div class="pomo-num-input">
+        <button onclick="pomoCfgChange('short',-1)">−</button>
+        <span id="cfg-short">5</span>
+        <button onclick="pomoCfgChange('short',1)">+</button>
+      </div>
+    </div>
+    <div class="pomo-setting-row">
+      <span>Descanso largo (min)</span>
+      <div class="pomo-num-input">
+        <button onclick="pomoCfgChange('long',-1)">−</button>
+        <span id="cfg-long">15</span>
+        <button onclick="pomoCfgChange('long',1)">+</button>
+      </div>
+    </div>
+    <div class="pomo-setting-row">
+      <span>Sesiones antes del descanso largo</span>
+      <div class="pomo-num-input">
+        <button onclick="pomoCfgChange('sessions',-1)">−</button>
+        <span id="cfg-sessions">4</span>
+        <button onclick="pomoCfgChange('sessions',1)">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- TAB: RETO -->
 <div id="tab-reto" class="tab">
   <div class="streak-header">
@@ -718,6 +946,9 @@ input[type="file"] { display: none; }
   </button>
   <button onclick="showTab('series', this)">
     <span class="nav-icon">📺</span>Series
+  </button>
+  <button onclick="showTab('pomodoro', this)">
+    <span class="nav-icon">🍅</span>Pomo
   </button>
   <button onclick="showTab('reto', this)">
     <span class="nav-icon">🔥</span>Reto
@@ -837,7 +1068,8 @@ function showTab(name, btn) {
   document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
-  if (name === 'reto') renderCalendar();
+  if (name === 'reto')      renderCalendar();
+  if (name === 'pomodoro')  pomoRequestNotify();
 }
 
 // ── Filtros ───────────────────────────────────────────────────────────
@@ -1232,6 +1464,227 @@ function resetFilters(tipo) {
   bar.querySelectorAll('.filter-star-btn').forEach((b,i) => b.classList.toggle('active', i===0));
   renderTipo(tipo);
 }
+
+// ── Pomodoro ──────────────────────────────────────────────────────────
+const POMO_KEY = 'pomo-v1';
+
+const pomoDefaults = { work: 25, short: 5, long: 15, sessions: 4 };
+
+let pomoConfig = Object.assign({}, pomoDefaults);
+let pomoState = {
+  phase: 'work',        // 'work' | 'short' | 'long'
+  currentSession: 1,
+  secondsLeft: 25 * 60,
+  running: false,
+  completedSessions: 0  // sessions completed today (full cycles)
+};
+let pomoInterval = null;
+let pomoStats = { totalAll: 0, todayKey: '', todayCount: 0, todayMin: 0 };
+
+function pomoLoadStorage() {
+  try {
+    const raw = localStorage.getItem(POMO_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      pomoConfig = Object.assign({}, pomoDefaults, s.config);
+      pomoStats  = Object.assign({ totalAll: 0, todayKey: '', todayCount: 0, todayMin: 0 }, s.stats);
+    }
+  } catch(e) {}
+  // Reset today stats if different day
+  const tk = todayKey();
+  if (pomoStats.todayKey !== tk) {
+    pomoStats.todayKey   = tk;
+    pomoStats.todayCount = 0;
+    pomoStats.todayMin   = 0;
+  }
+}
+
+function pomoSaveStorage() {
+  localStorage.setItem(POMO_KEY, JSON.stringify({ config: pomoConfig, stats: pomoStats }));
+}
+
+function pomoSecondsForPhase(phase) {
+  if (phase === 'work')  return pomoConfig.work  * 60;
+  if (phase === 'short') return pomoConfig.short * 60;
+  return pomoConfig.long * 60;
+}
+
+function pomoNextPhase() {
+  if (pomoState.phase === 'work') {
+    // A work session just finished
+    pomoState.completedSessions++;
+    pomoStats.totalAll++;
+    pomoStats.todayCount++;
+    pomoStats.todayMin += pomoConfig.work;
+    pomoSaveStorage();
+
+    // Auto-mark today as active on the streak calendar
+    const tk = todayKey();
+    if (!data.readDays.includes(tk)) {
+      data.readDays.push(tk);
+      save();
+      if (document.getElementById('tab-reto').classList.contains('active')) renderCalendar();
+    }
+
+    if (pomoState.completedSessions >= pomoConfig.sessions) {
+      pomoState.completedSessions = 0;
+      pomoState.currentSession = 1;
+      pomoState.phase = 'long';
+    } else {
+      pomoState.currentSession++;
+      pomoState.phase = 'short';
+    }
+    pomoNotify('¡Tiempo de descanso! 🎉', pomoState.phase === 'long' ? 'Descansa largo, lo mereces.' : 'Descansito corto.');
+  } else {
+    // Break finished → back to work
+    pomoState.phase = 'work';
+    pomoNotify('¡Vuelta al trabajo! 🍅', `Sesión ${pomoState.currentSession} de ${pomoConfig.sessions}`);
+  }
+  pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
+  pomoState.running = false;
+  clearInterval(pomoInterval);
+  pomoInterval = null;
+  pomoRenderAll();
+}
+
+function pomodoroToggle() {
+  if (pomoState.running) {
+    clearInterval(pomoInterval);
+    pomoInterval = null;
+    pomoState.running = false;
+    document.getElementById('pomo-btn-play').textContent = '▶';
+  } else {
+    pomoState.running = true;
+    document.getElementById('pomo-btn-play').textContent = '⏸';
+    pomoInterval = setInterval(pomoTick, 1000);
+  }
+}
+
+function pomoTick() {
+  if (pomoState.secondsLeft <= 0) {
+    pomoNextPhase();
+    return;
+  }
+  pomoState.secondsLeft--;
+  pomoRenderTimer();
+  pomoRenderStats();
+}
+
+function pomodoroReset() {
+  clearInterval(pomoInterval);
+  pomoInterval = null;
+  pomoState.running = false;
+  pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
+  document.getElementById('pomo-btn-play').textContent = '▶';
+  pomoRenderAll();
+}
+
+function pomodoroSkip() {
+  clearInterval(pomoInterval);
+  pomoInterval = null;
+  pomoState.running = false;
+  document.getElementById('pomo-btn-play').textContent = '▶';
+  pomoNextPhase();
+}
+
+function pomoCfgChange(key, delta) {
+  const mins = { work: [1,99], short: [1,30], long: [1,60], sessions: [1,10] };
+  const [min, max] = mins[key];
+  pomoConfig[key] = Math.min(max, Math.max(min, pomoConfig[key] + delta));
+  document.getElementById('cfg-' + key).textContent = pomoConfig[key];
+  // If currently in that phase and timer hasn't started, reset seconds
+  const phaseMap = { work: 'work', short: 'short', long: 'long' };
+  if (phaseMap[key] === pomoState.phase && !pomoState.running) {
+    pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
+    pomoRenderTimer();
+  }
+  pomoSaveStorage();
+}
+
+function pomoRenderAll() {
+  pomoRenderPhase();
+  pomoRenderTimer();
+  pomoRenderDots();
+  pomoRenderStats();
+  pomoRenderCfg();
+}
+
+function pomoRenderPhase() {
+  const label = document.getElementById('pomo-phase-label');
+  const ring  = document.getElementById('pomo-ring');
+  if (!label) return;
+  label.className = 'pomo-phase ' + pomoState.phase;
+  label.textContent = pomoState.phase === 'work' ? 'Trabajo' : pomoState.phase === 'short' ? 'Descanso corto' : 'Descanso largo';
+  ring.className = 'pomo-prog ' + pomoState.phase;
+}
+
+function pomoRenderTimer() {
+  const total = pomoSecondsForPhase(pomoState.phase);
+  const left  = pomoState.secondsLeft;
+  const mins  = Math.floor(left / 60);
+  const secs  = left % 60;
+  const display = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+  document.getElementById('pomo-display').textContent = display;
+
+  // SVG ring: r=88, circumference=553
+  const C = 553;
+  const offset = C - (left / total) * C;
+  const ring = document.getElementById('pomo-ring');
+  if (ring) ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+
+  const sessionLabel = document.getElementById('pomo-session-label');
+  if (sessionLabel) {
+    if (pomoState.phase === 'work') {
+      sessionLabel.textContent = `Sesión ${pomoState.currentSession} de ${pomoConfig.sessions}`;
+    } else {
+      sessionLabel.textContent = pomoState.phase === 'long' ? 'Descanso largo 🌴' : 'Descanso corto ☕';
+    }
+  }
+}
+
+function pomoRenderDots() {
+  const container = document.getElementById('pomo-dots');
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < pomoConfig.sessions; i++) {
+    const d = document.createElement('div');
+    d.className = 'pomo-dot' + (i < pomoState.completedSessions ? ' done' : '');
+    container.appendChild(d);
+  }
+}
+
+function pomoRenderStats() {
+  const hoyEl   = document.getElementById('pomo-stat-hoy');
+  const totalEl = document.getElementById('pomo-stat-total');
+  const minEl   = document.getElementById('pomo-stat-min');
+  if (hoyEl)   hoyEl.textContent   = pomoStats.todayCount;
+  if (totalEl) totalEl.textContent = pomoStats.totalAll;
+  if (minEl)   minEl.textContent   = pomoStats.todayMin;
+}
+
+function pomoRenderCfg() {
+  ['work','short','long','sessions'].forEach(k => {
+    const el = document.getElementById('cfg-' + k);
+    if (el) el.textContent = pomoConfig[k];
+  });
+}
+
+function pomoNotify(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: './icon-192.png' });
+  }
+}
+
+function pomoRequestNotify() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+// Init Pomodoro
+pomoLoadStorage();
+pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
+pomoRenderAll();
 
 // ── Init ──────────────────────────────────────────────────────────────
 renderAll();
