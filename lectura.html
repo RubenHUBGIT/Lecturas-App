@@ -1531,6 +1531,7 @@ function pomoSecondsForPhase(phase) {
 }
 
 function pomoFinishPhase() {
+  pomoCancelSW();  // prevent duplicate SW notification if foreground caught it first
   // Haptic + audio feedback
   if ('vibrate' in navigator) navigator.vibrate([500, 150, 500, 150, 800]);
   if (pomoConfig.alarm) pomoPlayAlarm();
@@ -1614,13 +1615,15 @@ function pomodoroToggle() {
     pomoInterval = null;
     pomoState.running = false;
     pomoState.endTime = null;
+    pomoCancelSW();
     document.title = 'Lectura';
     document.getElementById('pomo-btn-play').textContent = '▶';
   } else {
     pomoState.running = true;
     pomoState.endTime = Date.now() + pomoState.secondsLeft * 1000;
     document.getElementById('pomo-btn-play').textContent = '⏸';
-    pomoInterval = setInterval(pomoTick, 500); // 500 ms → recovers faster after bg
+    pomoInterval = setInterval(pomoTick, 500);
+    pomoScheduleSW();  // tell SW to fire notification when phase ends
   }
 }
 
@@ -1629,6 +1632,7 @@ function pomodoroReset() {
   pomoInterval = null;
   pomoState.running = false;
   pomoState.endTime = null;
+  pomoCancelSW();
   pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
   document.title = 'Lectura';
   document.getElementById('pomo-btn-play').textContent = '▶';
@@ -1640,6 +1644,7 @@ function pomodoroSkip() {
   pomoInterval = null;
   pomoState.running = false;
   pomoState.endTime = null;
+  pomoCancelSW();
   document.title = 'Lectura';
   document.getElementById('pomo-btn-play').textContent = '▶';
   pomoFinishPhase();
@@ -1766,6 +1771,39 @@ function pomoRequestNotify() {
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
   }
+}
+
+// ── Service Worker messaging for background timer ──
+function pomoEndLabel() {
+  // Returns the notification text that will appear when this phase ends
+  if (pomoState.phase === 'work') {
+    const nextIsLong =
+      (pomoState.completedSessions + 1) >= pomoConfig.sessions;
+    return {
+      title: '¡Tiempo de descanso! 🎉',
+      body:  nextIsLong ? 'Descansa largo, lo mereces.' : 'Descansito corto ☕'
+    };
+  }
+  return {
+    title: '¡Vuelta al trabajo! 🍅',
+    body:  `Sesión ${pomoState.currentSession} de ${pomoConfig.sessions}`
+  };
+}
+
+function pomoSendSW(msg) {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage(msg);
+  }
+}
+
+function pomoScheduleSW() {
+  if (Notification.permission !== 'granted') return;
+  const { title, body } = pomoEndLabel();
+  pomoSendSW({ type: 'POMO_START', endTime: pomoState.endTime, title, body });
+}
+
+function pomoCancelSW() {
+  pomoSendSW({ type: 'POMO_CANCEL' });
 }
 
 // Init Pomodoro
