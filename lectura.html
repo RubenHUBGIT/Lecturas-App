@@ -643,6 +643,20 @@ input[type="file"] { display: none; }
   color: #555;
 }
 .pomo-setting-row:last-child { margin-bottom: 0; }
+/* toggle switch */
+.pomo-toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+.pomo-toggle input { opacity: 0; width: 0; height: 0; }
+.pomo-toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #ccc; border-radius: 24px; transition: .3s;
+}
+.pomo-toggle-slider:before {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .3s;
+}
+.pomo-toggle input:checked + .pomo-toggle-slider { background: #27ae60; }
+.pomo-toggle input:checked + .pomo-toggle-slider:before { transform: translateX(20px); }
 .pomo-num-input {
   display: flex;
   align-items: center;
@@ -882,6 +896,13 @@ input[type="file"] { display: none; }
         <span id="cfg-sessions">4</span>
         <button onclick="pomoCfgChange('sessions',1)">+</button>
       </div>
+    </div>
+    <div class="pomo-setting-row">
+      <span>🔔 Alarma sonora al acabar</span>
+      <label class="pomo-toggle">
+        <input type="checkbox" id="cfg-alarm" onchange="pomoCfgToggle('alarm',this.checked)">
+        <span class="pomo-toggle-slider"></span>
+      </label>
     </div>
   </div>
 </div>
@@ -1468,7 +1489,7 @@ function resetFilters(tipo) {
 // ── Pomodoro ──────────────────────────────────────────────────────────
 const POMO_KEY = 'pomo-v1';
 
-const pomoDefaults = { work: 25, short: 5, long: 15, sessions: 4 };
+const pomoDefaults = { work: 25, short: 5, long: 15, sessions: 4, alarm: true };
 
 let pomoConfig = Object.assign({}, pomoDefaults);
 let pomoState = {
@@ -1476,7 +1497,8 @@ let pomoState = {
   currentSession: 1,
   secondsLeft: 25 * 60,
   running: false,
-  completedSessions: 0  // sessions completed today (full cycles)
+  completedSessions: 0, // sessions completed in this cycle
+  endTime: null         // Date.now() ms when this phase ends
 };
 let pomoInterval = null;
 let pomoStats = { totalAll: 0, todayKey: '', todayCount: 0, todayMin: 0 };
@@ -1490,7 +1512,6 @@ function pomoLoadStorage() {
       pomoStats  = Object.assign({ totalAll: 0, todayKey: '', todayCount: 0, todayMin: 0 }, s.stats);
     }
   } catch(e) {}
-  // Reset today stats if different day
   const tk = todayKey();
   if (pomoStats.todayKey !== tk) {
     pomoStats.todayKey   = tk;
@@ -1509,19 +1530,23 @@ function pomoSecondsForPhase(phase) {
   return pomoConfig.long * 60;
 }
 
-function pomoNextPhase() {
+function pomoFinishPhase() {
+  // Haptic + audio feedback
+  if ('vibrate' in navigator) navigator.vibrate([500, 150, 500, 150, 800]);
+  if (pomoConfig.alarm) pomoPlayAlarm();
+
   if (pomoState.phase === 'work') {
-    // A work session just finished
     pomoState.completedSessions++;
     pomoStats.totalAll++;
     pomoStats.todayCount++;
     pomoStats.todayMin += pomoConfig.work;
     pomoSaveStorage();
 
-    // Auto-mark today as active on the streak calendar
+    // Auto-mark today on the streak calendar
+    const appData = load();
     const tk = todayKey();
-    if (!data.readDays.includes(tk)) {
-      data.readDays.push(tk);
+    if (!appData.readDays.includes(tk)) {
+      appData.readDays.push(tk);
       save();
       if (document.getElementById('tab-reto').classList.contains('active')) renderCalendar();
     }
@@ -1536,45 +1561,76 @@ function pomoNextPhase() {
     }
     pomoNotify('¡Tiempo de descanso! 🎉', pomoState.phase === 'long' ? 'Descansa largo, lo mereces.' : 'Descansito corto.');
   } else {
-    // Break finished → back to work
     pomoState.phase = 'work';
     pomoNotify('¡Vuelta al trabajo! 🍅', `Sesión ${pomoState.currentSession} de ${pomoConfig.sessions}`);
   }
   pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
+  pomoState.endTime = null;
   pomoState.running = false;
   clearInterval(pomoInterval);
   pomoInterval = null;
+  document.title = 'Lectura';
   pomoRenderAll();
 }
+
+// Timestamp-based tick — correct even after screen-off gaps
+function pomoTick() {
+  if (!pomoState.endTime) return;
+  const left = Math.round((pomoState.endTime - Date.now()) / 1000);
+  if (left <= 0) {
+    pomoState.secondsLeft = 0;
+    pomoRenderTimer();
+    pomoFinishPhase();
+    return;
+  }
+  pomoState.secondsLeft = left;
+  pomoRenderTimer();
+  pomoRenderStats();
+  // Keep title updated so it's visible in the app switcher
+  const mm = String(Math.floor(left / 60)).padStart(2,'0');
+  const ss = String(left % 60).padStart(2,'0');
+  document.title = (pomoState.phase === 'work' ? '🍅' : '☕') + ' ' + mm + ':' + ss + ' – Lectura';
+}
+
+// Catch up when the screen wakes up / tab becomes visible
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && pomoState.running && pomoState.endTime) {
+    const left = Math.round((pomoState.endTime - Date.now()) / 1000);
+    if (left <= 0) {
+      pomoState.secondsLeft = 0;
+      clearInterval(pomoInterval);
+      pomoInterval = null;
+      pomoFinishPhase();
+    } else {
+      pomoState.secondsLeft = left;
+      pomoRenderTimer();
+    }
+  }
+});
 
 function pomodoroToggle() {
   if (pomoState.running) {
     clearInterval(pomoInterval);
     pomoInterval = null;
     pomoState.running = false;
+    pomoState.endTime = null;
+    document.title = 'Lectura';
     document.getElementById('pomo-btn-play').textContent = '▶';
   } else {
     pomoState.running = true;
+    pomoState.endTime = Date.now() + pomoState.secondsLeft * 1000;
     document.getElementById('pomo-btn-play').textContent = '⏸';
-    pomoInterval = setInterval(pomoTick, 1000);
+    pomoInterval = setInterval(pomoTick, 500); // 500 ms → recovers faster after bg
   }
-}
-
-function pomoTick() {
-  if (pomoState.secondsLeft <= 0) {
-    pomoNextPhase();
-    return;
-  }
-  pomoState.secondsLeft--;
-  pomoRenderTimer();
-  pomoRenderStats();
 }
 
 function pomodoroReset() {
   clearInterval(pomoInterval);
   pomoInterval = null;
   pomoState.running = false;
+  pomoState.endTime = null;
   pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
+  document.title = 'Lectura';
   document.getElementById('pomo-btn-play').textContent = '▶';
   pomoRenderAll();
 }
@@ -1583,8 +1639,10 @@ function pomodoroSkip() {
   clearInterval(pomoInterval);
   pomoInterval = null;
   pomoState.running = false;
+  pomoState.endTime = null;
+  document.title = 'Lectura';
   document.getElementById('pomo-btn-play').textContent = '▶';
-  pomoNextPhase();
+  pomoFinishPhase();
 }
 
 function pomoCfgChange(key, delta) {
@@ -1592,13 +1650,40 @@ function pomoCfgChange(key, delta) {
   const [min, max] = mins[key];
   pomoConfig[key] = Math.min(max, Math.max(min, pomoConfig[key] + delta));
   document.getElementById('cfg-' + key).textContent = pomoConfig[key];
-  // If currently in that phase and timer hasn't started, reset seconds
   const phaseMap = { work: 'work', short: 'short', long: 'long' };
   if (phaseMap[key] === pomoState.phase && !pomoState.running) {
     pomoState.secondsLeft = pomoSecondsForPhase(pomoState.phase);
     pomoRenderTimer();
   }
   pomoSaveStorage();
+}
+
+function pomoCfgToggle(key, val) {
+  pomoConfig[key] = val;
+  pomoSaveStorage();
+}
+
+// Synthesized alarm — 3 ascending beeps, no external audio files
+function pomoPlayAlarm() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const beep = (t, freq, dur) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.55, t + 0.03);
+      g.gain.setValueAtTime(0.55, t + dur - 0.06);
+      g.gain.linearRampToValueAtTime(0, t + dur);
+      o.start(t); o.stop(t + dur);
+    };
+    const t = ctx.currentTime;
+    beep(t,        880,  0.22);
+    beep(t + 0.32, 880,  0.22);
+    beep(t + 0.64, 1100, 0.55);
+  } catch(e) {}
 }
 
 function pomoRenderAll() {
@@ -1667,6 +1752,8 @@ function pomoRenderCfg() {
     const el = document.getElementById('cfg-' + k);
     if (el) el.textContent = pomoConfig[k];
   });
+  const alarmEl = document.getElementById('cfg-alarm');
+  if (alarmEl) alarmEl.checked = !!pomoConfig.alarm;
 }
 
 function pomoNotify(title, body) {
